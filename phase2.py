@@ -54,7 +54,7 @@ class Phase2:
             "n_citation": 0,
             "references": [],
             "title": title,
-            "venue": "",
+            "venue": None,
             "year": year,
             "id": id
         }
