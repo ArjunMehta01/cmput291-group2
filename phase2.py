@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from heapq import nlargest
 
 class Phase2:
     def __init__(self):
@@ -13,15 +14,53 @@ class Phase2:
     def handle_2(self):
         pass
     
-    def handle_3(self):
-        pass
     
+    def handle_3(self):
+        try:
+            n = int(input("Enter a value of n_ "))
+            while(n < 0):
+                n = input("n must be 0 or greater. Please enter a new n or EXIT to return to menu._ ")
+                if n == "EXIT":
+                    return
+        except:
+            print("must be integer >= 0")
+            return
 
+        # get top n venues
+        # TODO: change such that count / sort by number referencing venue
+        venue_pipeline = [
+            { "$project": { "_id": 0,  "id": 1, "venue": 1} }
 
-    # The user should be able to add an article to the collection by providing a unique id, 
-    # a title, a list of authors, and a year. The fields abstract and venue should be set to null, 
-    # references should be set to an empty array and n_citations should be set to zero.
+        ]
 
+        pipeline = [
+            # $match EXCLUDES empty string -> may be unneeded
+            { "$unwind" : "$references" },
+            { "$project": { "references": 1} }        
+        ]
+
+        # TODO: determine if we leave out '' venue
+        venuePipe = self.collection.aggregate(venue_pipeline)
+        referencePipe = self.collection.aggregate(pipeline)
+        
+        all_references = {}
+        id_venue = {}
+        # maxi = 0
+
+        for mem in venuePipe:
+            if mem["id"] not in id_venue.keys():
+                id_venue[mem["id"]] = mem['venue']
+
+        for mem in referencePipe:
+            if mem["references"] not in all_references.keys():
+                all_references[mem["references"]] = 1
+            else:
+                all_references[mem["references"]] += 1
+
+        res = nlargest(n, all_references, key = all_references.get)
+        print(res)
+        print("whore")
+        
     def handle_4(self):
         id = input("Enter Unique id_ ")
 
@@ -40,16 +79,21 @@ class Phase2:
                 break
             else:
                 author_list.append(new_author)
-        
-        year = int(input("Enter year_ "))
-        while(year < 0):
-            year = (input("year must be above 0. Please enter a new year or EXIT to return to menu._ "))
-            if id == "EXIT":
+        while(True):
+            try:
+                year = int(input("Enter year_ "))
+                while(year < 0):
+                    year = (input("year must be above 0. Please enter a new year or EXIT to return to menu._ "))
+                    if id == "EXIT":
+                        return
+                break
+            except:
+                print("year must be a number")
                 return
         
         # TODO: verify None is null
         dict_document = {
-            "abstract": None,
+            "abstract": "",
             "authors": author_list,
             "n_citation": 0,
             "references": [],

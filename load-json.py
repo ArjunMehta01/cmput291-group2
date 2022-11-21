@@ -18,7 +18,7 @@ def phase1():
 
     collection = db["dblp"]
     collection.drop()
-    with open("dblp-ref-10.json") as f:
+    with open("dblp-ref-1k.json") as f:
     # with open(json_file, 'r') as f:
         # data = json.load(f.read())
         for line in f:
