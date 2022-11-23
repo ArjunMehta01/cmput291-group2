@@ -199,8 +199,6 @@ class Phase2:
             }
         ]
 
-
-
         venue_count_pipe = [
             {
                 "$project": {"_id": 0, "id": 1, "venue": 1}
@@ -238,9 +236,9 @@ class Phase2:
         for i in range(0, len(largest)):
             print(str(i+1) + ".")
             print("\tVenue: " + largest[i])
-            print("\tNumber of references: " + str(dict_count_references_by_venue[res[i]]))
-            print("\tNumber of articles in venue: " + str(dict_count_articles_in_venue[res[i]]))
-            print("")
+            print("\tNumber of references: " + str(dict_count_references_by_venue[largest[i]]))
+            print("\tNumber of articles in venue: " + str(dict_count_articles_in_venue[largest[i]]))
+            print("----------------------------------")
 
     def handle_4(self):
         """
@@ -271,7 +269,6 @@ class Phase2:
                 return
         year = int(year)
 
-        # TODO: verify None is null
         dict_document = {
             "abstract": "",
             "authors": author_list,
@@ -286,7 +283,6 @@ class Phase2:
 
     def run(self):
         self.port = input("Enter port: ")
-        # client = MongoClient('mongodb://localhost:27012')
         client = MongoClient('mongodb://localhost:' + self.port)
 
         self.db = client["291db"]
