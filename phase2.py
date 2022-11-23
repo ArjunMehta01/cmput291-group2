@@ -30,7 +30,10 @@ class Phase2:
             print("Id: " + x["id"])
             print("Title: " + x["title"])
             print("Year: " + str(x["year"]))
-            print("Venue: " + x["venue"])
+            try:
+                print("Venue: " + x["venue"])
+            except:
+                print("No venue")
             print("----------------------------------")
             count += 1
 
@@ -60,7 +63,10 @@ class Phase2:
                 print("Id: " + id)
                 print("Title: " + y["title"])
                 print("Year: " + str(y["year"]))
-                print("Venue: " + y["venue"])
+                try:
+                    print("Venue: " + y["venue"])
+                except:
+                    print("No venue")
                 print("Authors: " + str(y["authors"]))
                 try:
                     print("Abstract: " + y["abstract"])

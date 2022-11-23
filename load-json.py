@@ -30,6 +30,9 @@ def phase1():
     print("--- %s seconds ---" %(time.time() - start_time))
 
 if __name__ == "__main__":
-    phase1()
-    test = Phase2()
-    test.run()
+    userInput = input("Enter 1 for phase 1 or 2 for phase 2: ")
+    if userInput == '1':
+        phase1()
+    else:
+        test = Phase2()
+        test.run()
