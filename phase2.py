@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-from heapq import nlargest
 
 class Phase2:
     def __init__(self):
@@ -9,58 +8,92 @@ class Phase2:
         print(self.port)
     
     def handle_1(self):
+        userInput = input("Enter keywords relating to an article to search for (Space seperated): ")
+    
+        if userInput == "EXIT":
+            return
+                
+        if not userInput.isdigit():
+            userInput = userInput.split(" ")
+            userInput ='\"' + '\" \"'.join(userInput) + '\"'
+            query = self.collection.find({"$text": {"$search": userInput}})
+        else:
+            query = self.collection.find({"year": int(userInput)})
+
+        print("----------------------------------")
+
+        count = 1
+        results = False
+        for x in query:
+            results = True
+            print("Result " + str(count))
+            print("Id: " + x["id"])
+            print("Title: " + x["title"])
+            print("Year: " + str(x["year"]))
+            print("Venue: " + x["venue"])
+            print("----------------------------------")
+            count += 1
+
+        query.rewind()
+
+        if not results:
+            print("No results found.")
+            return
+        
+        userInput = input("Enter a result to view more details, or EXIT to cancel: ")
+
+        while True:
+            if userInput == "EXIT":
+                return
+            if userInput.isdigit():
+                if int(userInput) >= count:
+                    userInput = input("Invalid entry. Please select a result or EXIT: ")
+                else:
+                    break
+            else: 
+                userInput = input("Invalid entry. Please select a result or EXIT: ")
+        
+        count = 1
+        for y in query:
+            if int(userInput) == count:
+                id = y["id"]
+                print("Id: " + id)
+                print("Title: " + y["title"])
+                print("Year: " + str(y["year"]))
+                print("Venue: " + y["venue"])
+                print("Authors: " + str(y["authors"]))
+                try:
+                    print("Abstract: " + y["abstract"])
+                except:
+                    print("No Abstract found.")
+                print("----------------------------------")
+                break
+            else:
+                count += 1
+
+        query = self.collection.find({"references": id})
+
+        print("References: ")
+
+        for x in query:
+            print(" Id: " + x['id'])
+            print(" Title: " + x['title'])
+            print(" Year: " + str(x['year']))
+            print("----------------------------------")
+        
         pass
     
     def handle_2(self):
         pass
     
-    
     def handle_3(self):
-        try:
-            n = int(input("Enter a value of n_ "))
-            while(n < 0):
-                n = input("n must be 0 or greater. Please enter a new n or EXIT to return to menu._ ")
-                if n == "EXIT":
-                    return
-        except:
-            print("must be integer >= 0")
-            return
+        pass
+    
 
-        # get top n venues
-        # TODO: change such that count / sort by number referencing venue
-        venue_pipeline = [
-            { "$project": { "_id": 0,  "id": 1, "venue": 1} }
+    # The user should be able to add an article to the collection by providing a unique id, 
+    # a title, a list of authors, and a year. The fields abstract and venue should be set to null, 
+    # references should be set to an empty array and n_citations should be set to zero.
 
-        ]
-
-        pipeline = [
-            # $match EXCLUDES empty string -> may be unneeded
-            { "$unwind" : "$references" },
-            { "$project": { "references": 1} }        
-        ]
-
-        # TODO: determine if we leave out '' venue
-        venuePipe = self.collection.aggregate(venue_pipeline)
-        referencePipe = self.collection.aggregate(pipeline)
-        
-        all_references = {}
-        id_venue = {}
-        # maxi = 0
-
-        for mem in venuePipe:
-            if mem["id"] not in id_venue.keys():
-                id_venue[mem["id"]] = mem['venue']
-
-        for mem in referencePipe:
-            if mem["references"] not in all_references.keys():
-                all_references[mem["references"]] = 1
-            else:
-                all_references[mem["references"]] += 1
-
-        res = nlargest(n, all_references, key = all_references.get)
-        print(res)
-        print("whore")
-        
     def handle_4(self):
         id = input("Enter Unique id_ ")
 
@@ -79,21 +112,16 @@ class Phase2:
                 break
             else:
                 author_list.append(new_author)
-        while(True):
-            try:
-                year = int(input("Enter year_ "))
-                while(year < 0):
-                    year = (input("year must be above 0. Please enter a new year or EXIT to return to menu._ "))
-                    if id == "EXIT":
-                        return
-                break
-            except:
-                print("year must be a number")
+        
+        year = int(input("Enter year_ "))
+        while(year < 0):
+            year = (input("year must be above 0. Please enter a new year or EXIT to return to menu._ "))
+            if id == "EXIT":
                 return
         
         # TODO: verify None is null
         dict_document = {
-            "abstract": "",
+            "abstract": None,
             "authors": author_list,
             "n_citation": 0,
             "references": [],
@@ -107,7 +135,7 @@ class Phase2:
 
 
     def run(self):
-        self.port = input("Enter port: ")
+        # self.port = input("Enter port: ")
         client = MongoClient('mongodb://localhost:27012')
         # client = MongoClient('mongodb://localhost:' + port)
 
