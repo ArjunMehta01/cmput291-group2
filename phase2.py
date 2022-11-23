@@ -84,7 +84,70 @@ class Phase2:
         pass
     
     def handle_2(self):
-        pass
+        """
+        handle_2 handles the user searching for authors in the database and selecting more
+        information on them.
+        """
+
+        #Printing author notif:
+        print("Phase 2: Searching Authors")
+        print("----------------------")
+        
+        userInput = input("Pleas enter a search keyword: ")
+
+        #Checking if keyword is valid:
+        if userInput is None:
+            print("Invalid keyword!")
+            return
+        
+        authorNames = set()
+
+        #Checking the authors names that matched:
+        for author in self.collection.find({"authors": {"$regex": ".*" + userInput + ".*" , "$options": 'i'}}):
+            for name in author["authors"]:
+                if userInput.lower() in name.lower():
+                    authorNames.add(name)
+
+        #Fecthing unique author names:
+        authorNames = list(authorNames)
+        print(authorNames) #Testing please remove after:
+            
+        authorPublics = []
+
+        #Fetching number of publications:
+        matches = 0
+        for name in authorNames:
+            matches += 1
+
+            authorPubs = self.collection.aggregate([{"$match": {"authors": name}}, 
+            {"$unwind": "$authors"}, 
+            {"$match": {"authors": name}}, 
+            {"$group": {"_id": "$authors", "numOfPubs": {"$sum": 1}}}])
+
+            authorPublics.append(list(authorPubs)[0])
+
+            displayName = authorPublics[matches - 1]["_id"]
+            publications = authorPublics[matches - 1]["numOfPubs"]
+
+            print("#" + str(matches) + " " + displayName + " publications: " + str(publications))
+
+        userInput = input("Input a number listed above to view author info: ")
+
+        name = None
+        if userInput.isnumeric() and 0 < int(userInput) and int(userInput) <= matches:
+            userInput = int(userInput)
+            name = authorPublics[userInput - 1]["_id"]
+
+        #Fetching the artist info:
+        authorInfo = self.collection.aggregate([{"$match": {"authors": name}},
+         {"$unwind": "$authors"},
+         {"$match": {"authors": name}},
+         {"$sort": {"year": -1}}])
+
+        authorInfo = list(authorInfo)
+        for release in authorInfo:
+            print("Title: " + release["title"] + " Year: " + str(release["year"]) + " Venue: " + release["venue"])
+        
     
     def handle_3(self):
         pass
