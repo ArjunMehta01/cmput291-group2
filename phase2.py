@@ -269,7 +269,8 @@ class Phase2:
             year = (input("year must be above 0. Please enter a new year or EXIT to return to menu._ "))
             if id == "EXIT":
                 return
-        
+        year = int(year)
+
         # TODO: verify None is null
         dict_document = {
             "abstract": "",
