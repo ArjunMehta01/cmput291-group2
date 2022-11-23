@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+dblp-ref-1m.json
+
 # Distribution / packaging
 .Python
 build/
