@@ -87,14 +87,12 @@ class Phase2:
         information on them.
         """
 
-        #Printing author notif:
         print("----------------------")
         print("Phase 2: Searching Authors")
         print("----------------------")
         
         userInput = input("Pleas enter a search keyword: ")
 
-        #Checking if keyword is valid:
         if userInput is None:
             print("Invalid keyword!")
             return
@@ -107,13 +105,10 @@ class Phase2:
                 if userInput.lower() in name.lower():
                     authorNames.add(name)
 
-        #Fecthing unique author names:
         authorNames = list(authorNames)
-        # print(authorNames) #Testing please remove after:
             
         authorPublics = []
 
-        #Fetching number of publications:
         matches = 0
 
         #Fetching all artists:
@@ -155,9 +150,18 @@ class Phase2:
         authorInfo = list(authorInfo)
         for release in authorInfo:
             print("----------------------------------")
-            print("Title: " + release["title"])
-            print("Year: " + str(release["year"]))
-            print("Venue: " + release["venue"])
+            try:
+                print("Title: " + release["title"])
+            except:
+                print("Title: None")
+            try:
+                print("Year: " + str(release["year"]))
+            except:
+                print("Year: None")
+            try:
+                print("Venue: " + release["venue"])
+            except:
+                print("Venue: None")
             print("----------------------------------")
             print("\n")
         
