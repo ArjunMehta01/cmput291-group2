@@ -30,9 +30,6 @@ def phase1():
     print("--- %s seconds ---" %(time.time() - start_time))
 
 if __name__ == "__main__":
-    userInput = input("Enter 1 for phase 1 or 2 for phase 2: ")
-    if userInput == '1':
-        phase1()
-    else:
-        test = Phase2()
-        test.run()
+    print("Setting Up MongoDB Server")
+    phase1()
+

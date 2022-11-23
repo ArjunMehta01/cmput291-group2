@@ -313,3 +313,7 @@ class Phase2:
                 break
             else:
                 print("Invalid choice. Please choose again.")
+
+if __name__ == "__main__":
+    mongoClient = Phase2()
+    mongoClient.run()
