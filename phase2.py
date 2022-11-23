@@ -87,13 +87,68 @@ class Phase2:
         pass
     
     def handle_3(self):
-        pass
-    
+        try:
+            n = int(input("Enter a value of n_ "))
+            while(n < 0):
+                n = input("n must be 0 or greater. Please enter a new n or EXIT to return to menu._ ")
+                if n == "EXIT":
+                    return
+        except:
+            print("must be integer >= 0")
+            return
+        
+        ref_pipe = [
+            {
+                "$unwind" : "$references"
+            },
+            {
+                "$group" : {
+                    '_id': "$references",
+                    "count": { "$sum": 1 },
+                }
+            }
+        ]
 
-    # The user should be able to add an article to the collection by providing a unique id, 
-    # a title, a list of authors, and a year. The fields abstract and venue should be set to null, 
-    # references should be set to an empty array and n_citations should be set to zero.
+        test = self.collection.aggregate(ref_pipe)
 
+
+        venue_count_pipe = [
+            {
+                "$project": {"_id": 0, "id": 1, "venue": 1}
+            }
+        ]
+
+        test2 = self.collection.aggregate(venue_count_pipe)
+
+        dict_id_to_venue = {}
+        dict_count_articles_in_venue = {}
+        dict_count_references_by_venue = {}
+
+        for mem in test2:
+            if mem["venue"] != "":
+                if(mem["venue"] not in dict_count_articles_in_venue) and mem["venue"] != "":
+                    dict_count_articles_in_venue[mem["venue"]] = 1
+                    dict_count_references_by_venue[mem["venue"]] = 0
+                else:
+                    dict_count_articles_in_venue[mem["venue"]] += 1
+            
+                dict_id_to_venue[mem["id"]] = mem["venue"]
+
+        for mem in test:
+            if mem["_id"] in dict_id_to_venue:
+                venue = dict_id_to_venue[mem["_id"]]
+                dict_count_references_by_venue[venue] += mem["count"]
+
+        res = nlargest(n, dict_count_references_by_venue, key = dict_count_references_by_venue.get)
+
+        for i in range(0, len(res)):
+            print(str(i+1) + ".")
+            print("\tVenue: " + res[i])
+            print("\tNumber of references: " + str(dict_count_references_by_venue[res[i]]))
+            print("\tNumber of articles in venue: " + str(dict_count_articles_in_venue[res[i]]))
+            print("")
+
+        
     def handle_4(self):
         id = input("Enter Unique id_ ")
 
