@@ -88,6 +88,7 @@ class Phase2:
         """
 
         #Printing author notif:
+        print("----------------------")
         print("Phase 2: Searching Authors")
         print("----------------------")
         
@@ -108,28 +109,37 @@ class Phase2:
 
         #Fecthing unique author names:
         authorNames = list(authorNames)
-        print(authorNames) #Testing please remove after:
+        # print(authorNames) #Testing please remove after:
             
         authorPublics = []
 
         #Fetching number of publications:
         matches = 0
-        for name in authorNames:
-            matches += 1
 
-            authorPubs = self.collection.aggregate([{"$match": {"authors": name}}, 
-            {"$unwind": "$authors"}, 
-            {"$match": {"authors": name}}, 
-            {"$group": {"_id": "$authors", "numOfPubs": {"$sum": 1}}}])
+        #Fetching all artists:
+        authorPubs = self.collection.aggregate([{"$match": {"authors": {"$in": authorNames}}}, 
+        {"$unwind": "$authors"}, 
+        {"$match": {"authors": {"$in": authorNames}}}, 
+        {"$group": {"_id": "$authors", "numOfPubs": {"$sum": 1}}}])
 
-            authorPublics.append(list(authorPubs)[0])
+        authorPublics = list(authorPubs)
 
-            displayName = authorPublics[matches - 1]["_id"]
-            publications = authorPublics[matches - 1]["numOfPubs"]
+        matches = len(authorPublics)
 
-            print("#" + str(matches) + " " + displayName + " publications: " + str(publications))
+        print("----------------------------------")
+        for i in range(matches):
+            displayName = authorPublics[i]["_id"]
+            publications = authorPublics[i]["numOfPubs"]
+            print("#" + str(i + 1) + " " + displayName + " publications: " + str(publications))
+        print("----------------------------------")
+        
+        print()
 
+        print("----------------------------------")
         userInput = input("Input a number listed above to view author info: ")
+        print("----------------------------------")
+    
+        print()
 
         name = None
         if userInput.isnumeric() and 0 < int(userInput) and int(userInput) <= matches:
@@ -144,9 +154,13 @@ class Phase2:
 
         authorInfo = list(authorInfo)
         for release in authorInfo:
-            print("Title: " + release["title"] + " Year: " + str(release["year"]) + " Venue: " + release["venue"])
+            print("----------------------------------")
+            print("Title: " + release["title"])
+            print("Year: " + str(release["year"]))
+            print("Venue: " + release["venue"])
+            print("----------------------------------")
+            print("\n")
         
-    
     def handle_3(self):
         """
         handle_3 handles the fetching of the top n venues based 
