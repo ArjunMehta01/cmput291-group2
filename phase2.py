@@ -260,9 +260,9 @@ class Phase2:
 
 
     def run(self):
-        # self.port = input("Enter port: ")
-        client = MongoClient('mongodb://localhost:27012')
-        # client = MongoClient('mongodb://localhost:' + port)
+        self.port = input("Enter port: ")
+        # client = MongoClient('mongodb://localhost:27012')
+        client = MongoClient('mongodb://localhost:' + self.port)
 
         self.db = client["291db"]
         self.collection = self.db["dblp"]

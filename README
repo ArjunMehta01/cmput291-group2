@@ -8,3 +8,5 @@ Sources used:
     Python documentation: https://docs.python.org/3/
     Mongodb: https://www.mongodb.com/docs/
     Pymongo: https://pymongo.readthedocs.io/en/stable/
+    
+    Explanation of searching dictionary for top values: https://www.geeksforgeeks.org/python-n-largest-values-in-dictionary/
